@@ -1,0 +1,76 @@
+{
+ "account": "dbmigration",
+ "annotations": {},
+ "application": "APPLICATION_NAME",
+ "cloudProvider": "kubernetes",
+ "cloudProviderType": "kubernetes",
+ "containers": [
+  {
+   "args": [
+    "-l",
+    "-c",
+    "JOB_COMMANDS"
+   ],
+   "command": [
+    "/bin/sh"
+   ],
+   "envFrom": [
+    {
+     "secretRef": {
+      "name": "CONTAINER_NAME-secret",
+      "optional": false
+     }
+    }
+   ],
+   "envVars": [],
+   "imageDescription": {
+    "account": "ecr",
+    "fromTrigger": true,
+    "imageId": "REPOSITORY_NAME:master.*",
+    "registry": "DOCKER_REGISTRY",
+    "repository": "REPOSITORY_NAME",
+    "tag": "master.*"
+   },
+   "imagePullPolicy": "ALWAYS",
+   "limits": {},
+   "name": "CONTAINER_NAME",
+   "ports": [
+    {
+     "containerPort": 80,
+     "name": "http",
+     "protocol": "TCP"
+    }
+   ],
+   "requests": {},
+   "securityContext": {
+     "runAsUser": 0
+   },
+   "volumeMounts": [],
+   "workingDir": "/REPOSITORY_NAME"
+  }
+ ],
+ "dnsPolicy": "Default",
+ "labels": {},
+ "name": "DB Migration",
+ "namespace": "dbmigration",
+ "nodeSelector": {},
+ "notifications": [
+  {
+   "address": "SLACK_CHANNEL",
+   "level": "stage",
+   "type": "slack",
+   "when": [
+    "stage.starting",
+    "stage.complete",
+    "stage.failed"
+   ]
+  }
+ ],
+ "refId": "3",
+ "requisiteStageRefIds": [
+  "2"
+ ],
+ "sendNotifications": true,
+ "type": "runJob",
+ "volumeSources": []
+}

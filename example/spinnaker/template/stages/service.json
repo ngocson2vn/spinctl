@@ -1,0 +1,38 @@
+{
+  "account": "eks-staging",
+  "cloudProvider": "kubernetes",
+  "manifestArtifactAccount": "embedded-artifact",
+  "manifests": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "APPLICATION_NAME",
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "http",
+            "port": 80,
+            "targetPort": 80
+          }
+        ],
+        "selector": {
+          "app": "APPLICATION_NAME"
+        }
+      }
+    }
+  ],
+  "moniker": {
+    "app": "APPLICATION_NAME"
+  },
+  "name": "CreateService",
+  "refId": "2",
+  "relationships": {
+    "loadBalancers": [],
+    "securityGroups": []
+  },
+  "requisiteStageRefIds": [],
+  "source": "text",
+  "type": "deployManifest"
+}

@@ -1,0 +1,146 @@
+{
+ "account": "eks-staging",
+ "cloudProvider": "kubernetes",
+ "manifestArtifactAccount": "embedded-artifact",
+ "manifests": [
+  {
+   "apiVersion": "extensions/v1beta1",
+   "kind": "Deployment",
+   "metadata": {},
+   "spec": {
+    "strategy": {
+     "rollingUpdate": {
+      "maxSurge": "100%",
+      "maxUnavailable": 0
+     },
+     "type": "RollingUpdate"
+    },
+    "template": {
+     "metadata": {
+      "labels": {
+       "app": "APPLICATION_NAME"
+      }
+     },
+     "spec": {
+      "containers": [
+       {
+        "image": "nginx_REPOSITORY_NAME",
+        "imagePullPolicy": "Always",
+        "lifecycle": {
+         "preStop": {
+          "exec": {
+           "command": [
+            "/usr/sbin/nginx",
+            "-s",
+            "quit"
+           ]
+          }
+         }
+        },
+        "name": "nginx-APPLICATION_NAME",
+        "ports": [
+         {
+          "containerPort": 80
+         }
+        ]
+       },
+       {
+        "args": [
+         "-l",
+         "-c",
+         "STARTUP_COMMAND"
+        ],
+        "command": [
+         "/bin/sh"
+        ],
+        "env": [
+          {
+            "name": "DD_AGENT_HOST",
+            "valueFrom": {
+              "fieldRef": {
+                "apiVersion": "v1",
+                "fieldPath": "status.hostIP"
+              }
+            }
+          }
+        ],
+        "envFrom": [
+         {
+          "secretRef": {
+           "name": "APPLICATION_NAME-secret"
+          }
+         }
+        ],
+        "image": "REPOSITORY_NAME",
+        "imagePullPolicy": "Always",
+        "lifecycle": {
+         "preStop": {
+          "exec": {
+           "command": [
+            "/bin/kill",
+            "-GRACEFUL_SIGNAL",
+            "1"
+           ]
+          }
+         }
+        },
+        "livenessProbe": {
+          "failureThreshold": 5,
+          "httpGet": {
+            "path": "/health_check",
+            "port": 3000,
+            "scheme": "HTTP"
+          },
+          "periodSeconds": 5,
+          "successThreshold": 1,
+          "timeoutSeconds": 10
+        },
+        "name": "APPLICATION_NAME",
+        "ports": [
+         {
+          "containerPort": 3000
+         }
+        ],
+        "securityContext": {
+          "runAsUser": 1000
+        },
+        "workingDir": "/home/ubuntu/REPOSITORY_NAME"
+       }
+      ],
+      "serviceAccountName": "APPLICATION_NAME-service-account"
+     }
+    }
+   }
+  }
+ ],
+ "moniker": {
+  "app": "APPLICATION_NAME"
+ },
+ "name": "Deploy Application",
+ "notifications": [
+  {
+   "address": "SLACK_CHANNEL",
+   "level": "stage",
+   "type": "slack",
+   "when": [
+    "stage.starting",
+    "stage.complete",
+    "stage.failed"
+   ]
+  }
+ ],
+ "refId": "4",
+ "relationships": {
+  "loadBalancers": [],
+  "securityGroups": []
+ },
+ "requiredArtifactIds": [
+  "MAIN_ARTIFACT_UUID"
+ ],
+ "requisiteStageRefIds": [
+  "3"
+ ],
+ "sendNotifications": true,
+ "source": "text",
+ "type": "deployManifest"
+}

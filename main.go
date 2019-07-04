@@ -18,11 +18,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spinnaker/spin/cmd"
-	"github.com/spinnaker/spin/util"
+	"github.com/spinctl/cmd"
+	"github.com/spinctl/util"
 )
 
 func main() {
+	fmt.Println("spinctl v2")
 	if err := cmd.Execute(os.Stdout); err != nil {
 		if util.UI != nil {
 			util.UI.Error(err.Error())

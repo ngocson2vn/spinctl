@@ -1,0 +1,46 @@
+{
+ "appConfig": {},
+ "application": "APPLICATION_NAME",
+ "expectedArtifacts": [
+  {
+   "defaultArtifact": {
+    "id": "5bcd9550-4483-4225-82b4-e2bd096c328b",
+    "kind": "custom"
+   },
+   "id": "MAIN_ARTIFACT_UUID",
+   "matchArtifact": {
+    "id": "MATCH_ARTIFACT_UUID",
+    "kind": "docker",
+    "name": "REPOSITORY_NAME",
+    "type": "docker/image"
+   },
+   "useDefaultArtifact": false,
+   "usePriorArtifact": false
+  }
+ ],
+ "id": "PIPELINE_UUID",
+ "index": 0,
+ "keepWaitingPipelines": true,
+ "lastModifiedBy": "OWNER_EMAIL",
+ "limitConcurrent": true,
+ "name": "PIPELINE_NAME",
+ "notifications": [],
+ "parameterConfig": [],
+ "stages": [],
+ "triggers": [
+  {
+   "account": "ecr",
+   "enabled": true,
+   "expectedArtifactIds": [
+    "MAIN_ARTIFACT_UUID"
+   ],
+   "fromTrigger": true,
+   "organization": "",
+   "registry": "DOCKER_REGISTRY",
+   "repository": "REPOSITORY_NAME",
+   "tag": "master.*",
+   "type": "docker"
+  }
+ ],
+ "updateTs": "UPDATE_TIMESTAMP"
+}

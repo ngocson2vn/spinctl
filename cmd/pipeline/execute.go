@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spinnaker/spin/cmd/gateclient"
-	"github.com/spinnaker/spin/util"
+	"github.com/spinctl/cmd/gateclient"
+	"github.com/spinctl/util"
 )
 
 type ExecuteOptions struct {

@@ -1,0 +1,48 @@
+application:
+  githubRepository: "sample"
+  ownerEmail: "sample@example.com"
+  cloudProviders: ["kubernetes"]
+  slackChannel: "sample-slack-channel"
+  pipelines:
+    - name: "DeployStagingApplications"
+      monitoring: true
+      stages:
+        - name: "CreateServiceAccount"
+          template: "serviceAccount"
+
+        - name: "DeployUtil"
+          template: "application"
+          metadata:
+            name: "sample-util"
+
+        - name: "ExecuteDbMigration"
+          template: "runJob"
+          commands:
+            - "bundle exec rake db:migrate"
+            - "bundle exec rake db:seed"
+            - "bundle exec rake db:seed_fu"
+
+        - name: "DeployApplication"
+          template: "application"
+
+        - name: "CreateService"
+          template: "service"
+
+        - name: "DeployWorkers"
+          template: "pipeline"
+          pipeline: "DeployStagingWorkers"
+
+    - name: "DeployStagingWorkers"
+      monitoring: false
+      stages:
+        - name: "DeployShoryuken"
+          template: "worker"
+          metadata:
+            name: "sample-shoryuken"
+          command: "bundle exec shoryuken -r /sample/lib/default_sqs_worker.rb"
+
+        - name: "DeploySidekiq"
+          template: "worker"
+          metadata:
+            name: "sample-sidekiq"
+          command: "bundle exec sidekiq -C config/sidekiq.yml"

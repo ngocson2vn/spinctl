@@ -4,11 +4,11 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/spinnaker/spin/cmd/application"
-	"github.com/spinnaker/spin/cmd/pipeline"
-	"github.com/spinnaker/spin/cmd/pipeline-template"
-	"github.com/spinnaker/spin/cmd/project"
-	"github.com/spinnaker/spin/version"
+	"github.com/spinctl/cmd/application"
+	"github.com/spinctl/cmd/pipeline"
+	"github.com/spinctl/cmd/pipeline-template"
+	"github.com/spinctl/cmd/project"
+	"github.com/spinctl/version"
 )
 
 type RootOptions struct {

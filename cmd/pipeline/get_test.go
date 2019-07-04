@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/spinnaker/spin/util"
+	"github.com/spinctl/util"
 )
 
 func getRootCmdForTest() *cobra.Command {

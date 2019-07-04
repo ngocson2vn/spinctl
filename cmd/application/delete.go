@@ -16,12 +16,12 @@ package application
 
 import (
 	"fmt"
-	"github.com/spinnaker/spin/cmd/orca-tasks"
+	"github.com/spinctl/cmd/orca-tasks"
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/spinnaker/spin/cmd/gateclient"
-	"github.com/spinnaker/spin/util"
+	"github.com/spinctl/cmd/gateclient"
+	"github.com/spinctl/util"
 )
 
 type DeleteOptions struct {

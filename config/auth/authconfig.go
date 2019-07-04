@@ -15,12 +15,12 @@
 package auth
 
 import (
-	"github.com/spinnaker/spin/config/auth/basic"
-	gsa "github.com/spinnaker/spin/config/auth/googleserviceaccount"
-	config "github.com/spinnaker/spin/config/auth/iap"
-	"github.com/spinnaker/spin/config/auth/ldap"
-	"github.com/spinnaker/spin/config/auth/oauth2"
-	"github.com/spinnaker/spin/config/auth/x509"
+	"github.com/spinctl/config/auth/basic"
+	gsa "github.com/spinctl/config/auth/googleserviceaccount"
+	config "github.com/spinctl/config/auth/iap"
+	"github.com/spinctl/config/auth/ldap"
+	"github.com/spinctl/config/auth/oauth2"
+	"github.com/spinctl/config/auth/x509"
 )
 
 // AuthConfig is the CLI's authentication configuration.

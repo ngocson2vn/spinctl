@@ -1,17 +1,3 @@
-// Copyright (c) 2019, Google, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
-
 package execution
 
 import (
@@ -24,7 +10,7 @@ import (
 	"strings"
 )
 
-type ListOptions struct {
+type MonitorOptions struct {
 	*executionOptions
 	output           string
 	pipelineConfigId string
@@ -36,21 +22,21 @@ type ListOptions struct {
 }
 
 var (
-	listExecutionShort = "List the executions for the provided pipeline id"
-	listExecutionLong  = "List the executions for the provided pipeline id"
+	monitorExecutionShort = "List the executions for the provided pipeline id"
+	monitorExecutionLong  = "List the executions for the provided pipeline id"
 )
 
-func NewListCmd(executionOptions executionOptions) *cobra.Command {
-	options := ListOptions{
+func NewMonitorCmd(executionOptions executionOptions) *cobra.Command {
+	options := MonitorOptions{
 		executionOptions: &executionOptions,
 	}
 	cmd := &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
-		Short:   listExecutionShort,
-		Long:    listExecutionLong,
+		Short:   monitorExecutionShort,
+		Long:    monitorExecutionLong,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return listExecution(cmd, options)
+			return monitorExecution(cmd, options)
 		},
 	}
 
@@ -64,7 +50,7 @@ func NewListCmd(executionOptions executionOptions) *cobra.Command {
 	return cmd
 }
 
-func listExecution(cmd *cobra.Command, options ListOptions) error {
+func monitorExecution(cmd *cobra.Command, options MonitorOptions) error {
 	gateClient, err := gateclient.NewGateClient(cmd.InheritedFlags())
 	if err != nil {
 		return err

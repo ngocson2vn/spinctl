@@ -15,27 +15,89 @@
 package execution
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/spinnaker/spin/cmd/gateclient"
-	"github.com/spinnaker/spin/util"
+	"github.com/spinctl/cmd/gateclient"
+	"github.com/spinctl/util"
 )
+
+// var (
+// 	getExecutionShort = "Get the specified execution"
+// 	getExecutionLong  = "Get the execution with the provided id "
+// )
+
+type GetOptions struct {
+	*executionOptions
+	application string
+	name        string
+}
 
 var (
-	getExecutionShort = "Get the specified execution"
-	getExecutionLong  = "Get the execution with the provided id "
+	getExecutionShort = "Get the latest execution"
+	getExecutionLong  = "Get the latest execution "
 )
 
-func NewGetCmd() *cobra.Command {
+func NewGetCmd(executionOptions executionOptions) *cobra.Command {
+	fmt.Println("execution.NewGetCmd")
+	options := GetOptions{
+		executionOptions: &executionOptions,
+	}
 	cmd := &cobra.Command{
 		Use:   "get",
 		Short: getExecutionShort,
 		Long:  getExecutionLong,
-		RunE:  getExecution,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return getLatestExecution(cmd, options)
+		},
 	}
+
+	cmd.PersistentFlags().StringVarP(&options.application, "application", "a", "", "Spinnaker application the pipeline belongs to")
+	cmd.PersistentFlags().StringVarP(&options.name, "name", "n", "", "name of the pipeline")
+
 	return cmd
+}
+
+func getLatestExecution(cmd *cobra.Command, options GetOptions) error {
+	fmt.Println("getLatestExecution")
+	gateClient, err := gateclient.NewGateClient(cmd.InheritedFlags())
+	if err != nil {
+		return err
+	}
+
+	if options.application == "" || options.name == "" {
+		return errors.New("one of required parameters 'application' or 'name' not set")
+	}
+
+	query := map[string]interface{}{
+		"limit":        int32(1),
+	}
+
+	successPayload, resp, err := gateClient.ApplicationControllerApi.GetPipelinesUsingGET(
+		gateClient.Context, options.application, query)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Encountered an error getting the latest execution, status code: %d\n",
+			resp.StatusCode)
+	}
+
+	for _, p := range successPayload {
+		pmap := p.(map[string]interface{})
+		if pmap["name"] == options.name {
+			fmt.Println(pmap["status"])
+			trigger := pmap["trigger"].(map[string]interface{})
+			fmt.Println(trigger["tag"])
+		}
+	}
+
+	// util.UI.JsonOutput(successPayload, util.UI.OutputFormat)
+	return nil
 }
 
 func getExecution(cmd *cobra.Command, args []string) error {
