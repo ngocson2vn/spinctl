@@ -41,7 +41,6 @@ var (
 )
 
 func NewGetCmd(executionOptions executionOptions) *cobra.Command {
-	fmt.Println("execution.NewGetCmd")
 	options := GetOptions{
 		executionOptions: &executionOptions,
 	}

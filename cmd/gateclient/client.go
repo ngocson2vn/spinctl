@@ -386,7 +386,7 @@ func (m *GatewayClient) authenticateOAuth2() error {
 			}
 		}
 
-		util.UI.Info("Caching oauth2 token.")
+		// util.UI.Info("Caching oauth2 token.")
 		OAuth2.CachedToken = newToken
 		_ = m.writeYAMLConfig()
 

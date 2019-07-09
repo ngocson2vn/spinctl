@@ -17,7 +17,6 @@ package execution
 import (
 	"github.com/spf13/cobra"
 	"io"
-	"fmt"
 )
 
 type executionOptions struct{}
@@ -29,7 +28,6 @@ var (
 )
 
 func NewExecutionCmd(out io.Writer) *cobra.Command {
-	fmt.Println("execution.NewExecutionCmd")
 	options := executionOptions{}
 	cmd := &cobra.Command{
 		Use:     "execution",

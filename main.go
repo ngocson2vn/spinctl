@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-	fmt.Println("spinctl v2")
 	if err := cmd.Execute(os.Stdout); err != nil {
 		if util.UI != nil {
 			util.UI.Error(err.Error())
