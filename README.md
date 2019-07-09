@@ -1,16 +1,8 @@
 # A wrapper of Spinnaker CLI
 
-## Problems
-When creating a new application
-- Developers cannot deliver the application to EKS by themselves because they don’t know how to create Spinnaker pipelines.
-- Spinnaker pipelines are complicated and it takes time to get acquainted with.
-- Developers cannot change Spinnaker pipelines, for example, they cannot add new async workers.
-- If the execution of Spinnaker pipelines is FAILED, developers need to open Spinnaker to check the errors ⇒ it’s not COOL!
 <p align="center">
   <img src="images/spinctl1.png">
 </p>
-
-## Solution
 <p align="center">
   <img src="images/spinctl2.png">
 </p>
