@@ -49,10 +49,16 @@ https://github.com/ngocson2vn/spinctl/tree/master/example/spinnaker
 <p align="center">
   <img src="images/spinctl8.png">
 </p>
+<p align="center">
+  <img src="images/spinctl9.png">
+</p>
 
 ### FAILED case
 <p align="center">
-  <img src="images/spinctl9.png">
+  <img src="images/spinctl10.png">
+</p>
+<p align="center">
+  <img src="images/spinctl11.png">
 </p>
 
 
