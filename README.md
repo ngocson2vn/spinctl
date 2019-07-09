@@ -1,6 +1,67 @@
-# Spinnaker CLI
+# A wrapper of Spinnaker CLI
 
-Edit pipelines, applications & intents.
+## Problems
+When creating a new application
+- Developers cannot deliver the application to EKS by themselves because they don’t know how to create Spinnaker pipelines.
+- Spinnaker pipelines are complicated and it takes time to get acquainted with.
+- Developers cannot change Spinnaker pipelines, for example, they cannot add new async workers.
+- If the execution of Spinnaker pipelines is FAILED, developers need to open Spinnaker to check the errors ⇒ it’s not COOL!
+<p align="center">
+  <img src="images/spinctl1.png">
+</p>
+
+## Solution
+<p align="center">
+  <img src="images/spinctl2.png">
+</p>
+<p align="center">
+  <img src="images/spinctl3.png">
+</p>
+<p align="center">
+  <img src="images/spinctl4.png">
+</p>
+<p align="center">
+  <img src="images/spinctl5.png">
+</p>
+<p align="center">
+  <img src="images/spinctl6.png">
+</p>
+<p align="center">
+  <img src="images/spinctl7.png">
+</p>
+
+## Demo
+### application.yml and template files
+https://github.com/ngocson2vn/spinctl/tree/master/example/spinnaker
+
+### CircleCI config
+```yaml
+  deploy-eks:
+    machine:
+      enabled: true
+      docker_layer_caching: true
+    working_directory: ~/sample
+    steps:
+      - checkout
+      - run: *setenv
+      - run:
+          name: Deploy app to EKS
+          command: |
+            latest=$(curl -s https://api.github.com/repos/ngocson2vn/spinctl/releases/latest | jq -r .tag_name)
+            wget https://github.com/ngocson2vn/spinctl/releases/download/$latest/spinctl -O /home/circleci/bin/spinctl
+            chmod 755 /home/circleci/bin/spinctl
+            aws s3 cp s3://${SECURE_BUCKET}/common/${DEPLOY_STAGE}/spin/config ~/.spin/config
+            /home/circleci/bin/spinctl application deploy --file .spinnaker/application.yml --image $NGINX_IMAGE_NAME --image $IMAGE_NAME
+```
+### SUCCEEDED case
+<p align="center">
+  <img src="images/spinctl8.png">
+</p>
+
+### FAILED case
+<p align="center">
+  <img src="images/spinctl9.png">
+</p>
 
 
 # Installation & Configuration
