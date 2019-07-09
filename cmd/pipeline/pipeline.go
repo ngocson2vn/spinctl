@@ -28,8 +28,8 @@ func NewPipelineCmd(out io.Writer) *cobra.Command {
 	cmd.AddCommand(NewGetCmd(options))
 	cmd.AddCommand(NewListCmd(options))
 	cmd.AddCommand(NewDeleteCmd(options))
-	cmd.AddCommand(NewSaveCmd(options))
-	cmd.AddCommand(NewExecuteCmd(options))
+	// cmd.AddCommand(NewSaveCmd(options))
+	// cmd.AddCommand(NewExecuteCmd(options))
 	cmd.AddCommand(execution.NewExecutionCmd(out))
 	return cmd
 }

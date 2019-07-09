@@ -3,11 +3,18 @@ package execution
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
+	"time"
+	// "github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spinctl/cmd/gateclient"
 	"github.com/spinctl/util"
 	"net/http"
-	"strings"
+	// "strings"
+)
+
+const (
+	STATUS_SUCCEEDED string = "SUCCEEDED"
+	STATUS_RUNNING string = "RUNNING"
 )
 
 type MonitorOptions struct {
@@ -26,78 +33,81 @@ var (
 	monitorExecutionLong  = "List the executions for the provided pipeline id"
 )
 
-func NewMonitorCmd(executionOptions executionOptions) *cobra.Command {
-	options := MonitorOptions{
-		executionOptions: &executionOptions,
-	}
-	cmd := &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   monitorExecutionShort,
-		Long:    monitorExecutionLong,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return monitorExecution(cmd, options)
-		},
+func Monitor(pipelineName string, executionId string, flags *pflag.FlagSet) error {
+	if executionId == "" {
+		return errors.New("required parameter 'executionId' not set")
 	}
 
-	cmd.PersistentFlags().StringVarP(&options.pipelineConfigId, "pipeline-id", "i", "", "Spinnaker pipeline id to list executions for")
-	cmd.PersistentFlags().Int32VarP(&options.limit, "limit", "l", -1, "number of executions to return")
-	cmd.PersistentFlags().BoolVar(&options.running, "running", false, "add filter for running executions")
-	cmd.PersistentFlags().BoolVar(&options.succeeded, "succeeded", false, "add filter for succeeded executions")
-	cmd.PersistentFlags().BoolVar(&options.failed, "failed", false, "add filter for failed executions")
-	cmd.PersistentFlags().BoolVar(&options.canceled, "canceled", false, "add filter for canceled executions")
+	pipelineStatus := ""
+	succeededStages := make(map[string]string)
+	hasPrinted := false
 
-	return cmd
+	for pipelineStatus != STATUS_SUCCEEDED {
+		payload, err := getPipelineExecution(executionId, flags)
+		pipeline := payload.(map[string]interface{})
+
+		if err != nil {
+			return err
+		}
+
+		pipelineStatus = pipeline["status"].(string)
+
+		if !hasPrinted && pipelineStatus == STATUS_RUNNING {
+			util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Pipeline %s is %s", pipelineName, pipelineStatus)))
+			hasPrinted = true
+		}
+
+		pipelineStages := pipeline["stages"].([]interface{})
+		for _, v := range pipelineStages {
+			stage := v.(map[string]interface{})
+			if _, ok := succeededStages[stage["name"].(string)]; ok {
+				continue
+			} else if stage["status"].(string) == STATUS_SUCCEEDED {
+				succeededStages[stage["name"].(string)] = STATUS_SUCCEEDED
+				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Stage %s is %s", stage["name"], stage["status"])))
+			} else if stage["status"].(string) == STATUS_RUNNING {
+				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Stage %s is %s", stage["name"], stage["status"])))
+			}
+		}
+
+		if pipelineStatus == STATUS_SUCCEEDED {
+			util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][blue]Pipeline %s is %s", pipelineName, pipelineStatus)))
+			break
+		}
+
+		time.Sleep(30 * time.Second)
+	}
+
+
+	return nil
 }
 
-func monitorExecution(cmd *cobra.Command, options MonitorOptions) error {
-	gateClient, err := gateclient.NewGateClient(cmd.InheritedFlags())
+func getPipelineExecution(executionId string, flags *pflag.FlagSet) (interface{}, error) {
+	gateClient, err := gateclient.NewGateClient(flags)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if options.pipelineConfigId == "" {
-		return errors.New("required parameter 'pipeline-id' not set")
+	retry := 0
+	var successPayload interface{}
+
+	for retry <= 3 {
+		payload, resp, err := gateClient.PipelineControllerApi.GetPipelineUsingGET(gateClient.Context, executionId)
+
+		if resp.StatusCode != http.StatusOK {
+			err = fmt.Errorf("Encountered an error getting pipeline execution id %s, status code: %d\n",
+				executionId,
+				resp.StatusCode)
+		}
+
+		if err == nil {
+			successPayload = payload
+			break
+		}
+
+		retry = retry + 1
+		time.Sleep(60 * time.Second)
 	}
 
-	query := map[string]interface{}{
-		"pipelineConfigIds": options.pipelineConfigId,
-	}
-
-	var statuses []string
-	if options.running {
-		statuses = append(statuses, "RUNNING")
-	}
-	if options.succeeded {
-		statuses = append(statuses, "SUCCEEDED", "STOPPED", "SKIPPED")
-	}
-	if options.failed {
-		statuses = append(statuses, "TERMINAL", "STOPPED", "FAILED_CONTINUE")
-	}
-	if options.canceled {
-		statuses = append(statuses, "CANCELED")
-	}
-	if len(statuses) > 0 {
-		query["statuses"] = strings.Join(statuses, ",")
-	}
-
-	if options.limit > 0 {
-		query["limit"] = options.limit
-	}
-
-	successPayload, resp, err := gateClient.ExecutionsControllerApi.GetLatestExecutionsByConfigIdsUsingGET(
-		gateClient.Context, query)
-
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Encountered an error listing executions for pipeline id %s, status code: %d\n",
-			options.pipelineConfigId,
-			resp.StatusCode)
-	}
-
-	util.UI.JsonOutput(successPayload, util.UI.OutputFormat)
-	return nil
+	return successPayload, err
 }

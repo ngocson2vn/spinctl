@@ -1,0 +1,85 @@
+{
+  "account": "eks-staging-workers",
+  "cloudProvider": "kubernetes",
+  "manifestArtifactAccount": "embedded-artifact",
+  "manifests": [
+    {
+      "apiVersion": "extensions/v1beta1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "DEPLOYMENT_NAME"
+      },
+      "spec": {
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "sample"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "-l",
+                  "-c",
+                  "WORKER_COMMAND"
+                ],
+                "command": [
+                  "/bin/sh"
+                ],
+                "envFrom": [
+                  {
+                    "secretRef": {
+                      "name": "sample-secret"
+                    }
+                  }
+                ],
+                "image": "sample",
+                "imagePullPolicy": "Always",
+                "lifecycle": {
+                  "preStop": {
+                    "exec": {
+                      "command": []
+                    }
+                  }
+                },
+                "name": "sample",
+                "securityContext": {
+                  "runAsUser": 0
+                },
+                "workingDir": "/sample"
+              }
+            ],
+            "terminationGracePeriodSeconds": 60
+          }
+        }
+      }
+    }
+  ],
+  "moniker": {
+    "app": "sample"
+  },
+  "name": "STAGE_NAME",
+  "notifications": [
+    {
+      "address": "SLACK_CHANNEL",
+      "level": "stage",
+      "type": "slack",
+      "when": [
+        "stage.starting",
+        "stage.complete",
+        "stage.failed"
+      ]
+    }
+  ],
+  "refId": "1",
+  "relationships": {
+    "loadBalancers": [],
+    "securityGroups": []
+  },
+  "requiredArtifactIds": [],
+  "requisiteStageRefIds": [],
+  "sendNotifications": true,
+  "source": "text",
+  "type": "deployManifest"
+}

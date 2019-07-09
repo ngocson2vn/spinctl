@@ -1,48 +1,53 @@
 application:
-  githubRepository: "sample"
+  name: "sample"
   ownerEmail: "sample@example.com"
   cloudProviders: ["kubernetes"]
-  slackChannel: "sample-slack-channel"
+  slackChannel: "community_org_ci"
   pipelines:
-    - name: "DeployStagingApplications"
-      monitoring: true
+    - name: "DeployApplications"
+      executable: true
       stages:
-        - name: "CreateServiceAccount"
-          template: "serviceAccount"
+        - name: "CreateSA"
+          inherit: "serviceAccount"
 
         - name: "DeployUtil"
-          template: "application"
+          inherit: "application"
           metadata:
             name: "sample-util"
+          labels:
+            version: "v1"
 
-        - name: "ExecuteDbMigration"
-          template: "runJob"
+        - name: "DbMigration"
+          inherit: "runJob"
           commands:
             - "bundle exec rake db:migrate"
             - "bundle exec rake db:seed"
             - "bundle exec rake db:seed_fu"
 
         - name: "DeployApplication"
-          template: "application"
+          inherit: "application"
+          labels:
+            version: "v1"
 
         - name: "CreateService"
-          template: "service"
+          inherit: "service"
 
         - name: "DeployWorkers"
-          template: "pipeline"
-          pipeline: "DeployStagingWorkers"
+          inherit: "runPipeline"
+          pipeline: "DeployWorkers"
 
-    - name: "DeployStagingWorkers"
-      monitoring: false
+    - name: "DeployWorkers"
       stages:
         - name: "DeployShoryuken"
-          template: "worker"
+          inherit: "worker"
+          type: "shoryuken"
           metadata:
             name: "sample-shoryuken"
           command: "bundle exec shoryuken -r /sample/lib/default_sqs_worker.rb"
 
         - name: "DeploySidekiq"
-          template: "worker"
+          inherit: "worker"
+          type: "sidekiq"
           metadata:
             name: "sample-sidekiq"
           command: "bundle exec sidekiq -C config/sidekiq.yml"

@@ -1,0 +1,146 @@
+{
+  "account": "eks-staging",
+  "cloudProvider": "kubernetes",
+  "manifestArtifactAccount": "embedded-artifact",
+  "manifests": [
+    {
+      "apiVersion": "extensions/v1beta1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "sample"
+      },
+      "spec": {
+        "strategy": {
+          "rollingUpdate": {
+            "maxSurge": "100%",
+            "maxUnavailable": 0
+          },
+          "type": "RollingUpdate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "sample"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "image": "nginx_sample",
+                "imagePullPolicy": "Always",
+                "lifecycle": {
+                  "preStop": {
+                    "exec": {
+                      "command": [
+                        "/usr/sbin/nginx",
+                        "-s",
+                        "quit"
+                      ]
+                    }
+                  }
+                },
+                "name": "nginx-sample",
+                "ports": [
+                  {
+                    "containerPort": 80
+                  }
+                ]
+              },
+              {
+                "args": [
+                  "-l",
+                  "-c",
+                  "bundle exec unicorn -c config/unicorn/staging.rb -E staging"
+                ],
+                "command": [
+                  "/bin/sh"
+                ],
+                "env": [
+                  {
+                    "name": "DD_AGENT_HOST",
+                    "valueFrom": {
+                      "fieldRef": {
+                        "apiVersion": "v1",
+                        "fieldPath": "status.hostIP"
+                      }
+                    }
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "secretRef": {
+                      "name": "sample-secret"
+                    }
+                  }
+                ],
+                "image": "sample",
+                "imagePullPolicy": "Always",
+                "lifecycle": {
+                  "preStop": {
+                    "exec": {
+                      "command": [
+                        "/bin/kill",
+                        "-QUIT",
+                        "1"
+                      ]
+                    }
+                  }
+                },
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "httpGet": {
+                    "path": "/health_check",
+                    "port": 3000,
+                    "scheme": "HTTP"
+                  },
+                  "periodSeconds": 5,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 10
+                },
+                "name": "sample",
+                "ports": [
+                  {
+                    "containerPort": 3000
+                  }
+                ],
+                "securityContext": {
+                  "runAsUser": 0
+                },
+                "workingDir": "/sample"
+              }
+            ],
+            "serviceAccountName": "sample-service-account"
+          }
+        }
+      }
+    }
+  ],
+  "moniker": {
+    "app": "sample"
+  },
+  "name": "STAGE_NAME",
+  "notifications": [
+    {
+      "address": "SLACK_CHANNEL",
+      "level": "stage",
+      "type": "slack",
+      "when": [
+        "stage.starting",
+        "stage.complete",
+        "stage.failed"
+      ]
+    }
+  ],
+  "refId": "4",
+  "relationships": {
+    "loadBalancers": [],
+    "securityGroups": []
+  },
+  "requiredArtifactIds": [],
+  "requisiteStageRefIds": [
+    "3"
+  ],
+  "sendNotifications": true,
+  "source": "text",
+  "type": "deployManifest"
+}

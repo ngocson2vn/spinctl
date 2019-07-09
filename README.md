@@ -15,7 +15,7 @@ Follow the instructions at [spinnaker.io](https://www.spinnaker.io/guides/spin/c
 Fetch the code
 
 ```bash
-$ go get github.com/spinctl
+$ go get github.com/ngocson2vn/spinctl
 ```
 
 **Note**: If you are using two-factor authentication with ssh keys to authenticate with GitHub,
@@ -30,7 +30,7 @@ for the `go get` command to work properly.
 Enter the code's directory
 
 ```bash
-$ cd $GOPATH/src/github.com/spinctl
+$ cd $GOPATH/src/github.com/ngocson2vn/spinctl
 ```
 
 Fetch dependencies and build with with
@@ -48,7 +48,7 @@ from the root `spin/` directory.
 Clone the repository to a directory outside of your GOPATH:
 
 ```bash
-$ git clone https://github.com/spinctl
+$ git clone https://github.com/ngocson2vn/spinctl
 ```
 
 Afterward, use `go build` to build the program. This will automatically fetch dependencies.

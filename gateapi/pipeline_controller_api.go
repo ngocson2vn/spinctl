@@ -822,13 +822,13 @@ func (a *PipelineControllerApiService) GetPipelineUsingGET(ctx context.Context, 
  @param optional (nil or map[string]interface{}) with one or more of:
      @param "trigger" (interface{}) trigger
  @return HttpEntity*/
-func (a *PipelineControllerApiService) InvokePipelineConfigUsingPOST1(ctx context.Context, application string, pipelineNameOrId string, localVarOptionals map[string]interface{}) (HttpEntity,  *http.Response, error) {
+func (a *PipelineControllerApiService) InvokePipelineConfigUsingPOST1(ctx context.Context, application string, pipelineNameOrId string, localVarOptionals map[string]interface{}) (map[string]interface{},  *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody interface{}
 		localVarFileName string
 		localVarFileBytes []byte
-	 	successPayload  HttpEntity
+	 	successPayload  map[string]interface{}
 	)
 
 	// create path and map variables
@@ -873,17 +873,15 @@ func (a *PipelineControllerApiService) InvokePipelineConfigUsingPOST1(ctx contex
 	if err != nil || localVarHttpResponse == nil {
 		return successPayload, localVarHttpResponse, err
 	}
+
 	defer localVarHttpResponse.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(localVarHttpResponse.Body)
+
 	if localVarHttpResponse.StatusCode >= 300 {
-		bodyBytes, _ := ioutil.ReadAll(localVarHttpResponse.Body)
 		return successPayload, localVarHttpResponse, reportError("Status: %v, Body: %s", localVarHttpResponse.Status, bodyBytes)
 	}
 
-	if err = json.NewDecoder(localVarHttpResponse.Body).Decode(&successPayload); err != nil {
-		return successPayload, localVarHttpResponse, err
-	}
-
-
+	err = json.Unmarshal(bodyBytes, &successPayload)
 	return successPayload, localVarHttpResponse, err
 }
 

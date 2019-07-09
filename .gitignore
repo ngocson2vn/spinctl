@@ -1,4 +1,5 @@
-spin
-spin.exe
+spinctl
+spinctl.exe
 .idea
 *.iml
+example/.spinnaker

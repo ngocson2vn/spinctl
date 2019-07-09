@@ -1,0 +1,16 @@
+{
+  "appConfig": {},
+  "application": "sample",
+  "expectedArtifacts": [],
+  "id": "PIPELINE_UUID",
+  "index": 0,
+  "keepWaitingPipelines": true,
+  "lastModifiedBy": "OWNER_EMAIL",
+  "limitConcurrent": true,
+  "name": "PIPELINE_NAME",
+  "notifications": [],
+  "parameterConfig": [],
+  "stages": [],
+  "triggers": [],
+  "updateTs": "UPDATE_TIMESTAMP"
+}

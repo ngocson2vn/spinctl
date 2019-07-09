@@ -1,0 +1,25 @@
+{
+  "application": "sample",
+  "failPipeline": true,
+  "name": "STAGE_NAME",
+  "notifications": [
+    {
+      "address": "SLACK_CHANNEL",
+      "level": "stage",
+      "type": "slack",
+      "when": [
+        "stage.starting",
+        "stage.complete",
+        "stage.failed"
+      ]
+    }
+  ],
+  "pipeline": "TARGET_PIPELINE_UUID",
+  "refId": "5",
+  "requisiteStageRefIds": [
+    "4"
+  ],
+  "sendNotifications": true,
+  "type": "pipeline",
+  "waitForCompletion": false
+}

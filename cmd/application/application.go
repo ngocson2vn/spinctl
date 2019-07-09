@@ -29,6 +29,6 @@ func NewApplicationCmd(out io.Writer) *cobra.Command {
 	cmd.AddCommand(NewGetCmd(options))
 	cmd.AddCommand(NewListCmd(options))
 	cmd.AddCommand(NewDeleteCmd(options))
-	cmd.AddCommand(NewSaveCmd(options))
+	cmd.AddCommand(NewDeployCmd(options))
 	return cmd
 }

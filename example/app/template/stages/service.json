@@ -7,7 +7,7 @@
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": "APPLICATION_NAME",
+        "name": "sample"
       },
       "spec": {
         "ports": [
@@ -18,21 +18,23 @@
           }
         ],
         "selector": {
-          "app": "APPLICATION_NAME"
+          "app": "sample"
         }
       }
     }
   ],
   "moniker": {
-    "app": "APPLICATION_NAME"
+    "app": "sample"
   },
-  "name": "CreateService",
-  "refId": "2",
+  "name": "STAGE_NAME",
+  "refId": "5",
   "relationships": {
     "loadBalancers": [],
     "securityGroups": []
   },
-  "requisiteStageRefIds": [],
+  "requisiteStageRefIds": [
+    "4"
+  ],
   "source": "text",
   "type": "deployManifest"
 }
