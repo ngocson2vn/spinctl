@@ -15,6 +15,9 @@ import (
 const (
 	STATUS_SUCCEEDED string = "SUCCEEDED"
 	STATUS_RUNNING string = "RUNNING"
+	STATUS_TERMINAL string = "TERMINAL"
+	STAGE_TYPE_RUN_JOB string = "runJob"
+	SLEEP_DURATION int = 16
 )
 
 type MonitorOptions struct {
@@ -39,7 +42,7 @@ func Monitor(pipelineName string, executionId string, flags *pflag.FlagSet) erro
 	}
 
 	pipelineStatus := ""
-	succeededStages := make(map[string]string)
+	stageHistories := make(map[string]bool)
 	hasPrinted := false
 
 	for pipelineStatus != STATUS_SUCCEEDED {
@@ -60,13 +63,23 @@ func Monitor(pipelineName string, executionId string, flags *pflag.FlagSet) erro
 		pipelineStages := pipeline["stages"].([]interface{})
 		for _, v := range pipelineStages {
 			stage := v.(map[string]interface{})
-			if _, ok := succeededStages[stage["name"].(string)]; ok {
+			key := fmt.Sprintf("%s-%s", stage["name"].(string), stage["status"].(string))
+			if _, ok := stageHistories[key]; ok {
 				continue
 			} else if stage["status"].(string) == STATUS_SUCCEEDED {
-				succeededStages[stage["name"].(string)] = STATUS_SUCCEEDED
-				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Stage %s is %s", stage["name"], stage["status"])))
+				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][blue]Stage %s is %s", stage["name"], stage["status"])))
+				stageHistories[key] = true
 			} else if stage["status"].(string) == STATUS_RUNNING {
 				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Stage %s is %s", stage["name"], stage["status"])))
+				stageHistories[key] = true
+			} else if stage["status"].(string) == STATUS_TERMINAL {
+				util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][red]Stage %s is %s", stage["name"], stage["status"])))
+				if stage["type"].(string) == STAGE_TYPE_RUN_JOB {
+					logs := stage["outputs"].(map[string]interface{})["jobStatus"].(map[string]interface{})["logs"].(string)
+					util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][red]%s", logs)))
+				}
+
+				break
 			}
 		}
 
@@ -75,9 +88,19 @@ func Monitor(pipelineName string, executionId string, flags *pflag.FlagSet) erro
 			break
 		}
 
-		time.Sleep(30 * time.Second)
-	}
+		if pipelineStatus == STATUS_TERMINAL {
+			util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][red]Pipeline %s is %s", pipelineName, pipelineStatus)))
+			break
+		}
 
+		i := 0
+		for i < SLEEP_DURATION {
+			fmt.Printf(".")
+			time.Sleep(1 * time.Second)
+			i = i + 1
+		}
+		fmt.Println("")
+	}
 
 	return nil
 }
