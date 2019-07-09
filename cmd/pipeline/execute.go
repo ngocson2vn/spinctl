@@ -56,7 +56,10 @@ func Execute(applicationName string, pipelineName string, flags *pflag.FlagSet) 
 	util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][green]Pipeline execution id: %s", executionId)))
 
 	time.Sleep(5 * time.Second)
-	execution.Monitor(pipelineName, executionId, flags)
+	err = execution.Monitor(pipelineName, executionId, flags)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -1,0 +1,9 @@
+#!/bin/bash
+REPO=$(basename `pwd`)
+github-release upload \
+  --owner ngocson2vn \
+  --repo $REPO \
+  --tag "v0.1.5" \
+  --name "v0.1.5" \
+  --body "New release for Linux OS" \
+  $REPO

@@ -89,8 +89,7 @@ func Monitor(pipelineName string, executionId string, flags *pflag.FlagSet) erro
 		}
 
 		if pipelineStatus == STATUS_TERMINAL {
-			util.UI.Info(util.Colorize().Color(fmt.Sprintf("[reset][bold][red]Pipeline %s is %s", pipelineName, pipelineStatus)))
-			break
+			return fmt.Errorf("Error: Pipeline %s is %s\n", pipelineName, pipelineStatus)
 		}
 
 		i := 0
