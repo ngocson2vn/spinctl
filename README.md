@@ -1,4 +1,4 @@
-# A wrapper of Spinnaker CLI
+# An extension of Spinnaker CLI
 
 <p align="center">
   <img src="images/spinctl1.png">
